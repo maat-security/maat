@@ -1,0 +1,166 @@
+# Maat — Manual QA Plan
+
+This is a plan for a human to run through, not an automated suite. Everything below has already been verified with throwaway headless scripts during development (no screenshots — see the note at the bottom on why), but none of that replaces actually looking at the app on a real screen, on each real OS.
+
+Report bugs using the template at the bottom. **Never attach your real vault file, your real passphrase, or a real password manager export to a bug report** — this tool exists specifically to keep that data off other people's servers; don't undo that while reporting a bug about it. Use throwaway test data (see [Test Data](#test-data) below).
+
+## Setup Per OS
+
+### Windows
+
+```powershell
+git clone https://github.com/maat-security/maat.git
+cd maat
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+python src\main.py
+```
+
+Vault location to check: `%APPDATA%\Maat\`
+
+### macOS
+
+```bash
+git clone https://github.com/maat-security/maat.git
+cd maat
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python src/main.py
+```
+
+Vault location to check: `~/Library/Application Support/Maat/`
+
+### Linux
+
+```bash
+git clone https://github.com/maat-security/maat.git
+cd maat
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python src/main.py
+```
+
+Vault location to check: `~/.local/share/Maat/`
+
+Note which desktop environment and display server (X11 vs Wayland) you're on — CustomTkinter/Tk rendering issues are more likely here than on Windows/macOS.
+
+### PyInstaller Build (all three OSes)
+
+```bash
+pip install pyinstaller
+pyinstaller build.spec
+```
+
+Run the binary from `dist/` directly — don't run it from inside the source checkout with the venv active, since the point is to catch anything that only breaks once bundled (missing data files, path resolution, etc.).
+
+## Test Data
+
+Don't use your real accounts. Options:
+
+- **1Password**: create a free trial or a throwaway vault with 3-5 fake logins (mix of password-only, one with TOTP enabled, one with a passkey if your test device supports it), then export it as 1PUX (Settings → Export → 1Password Unencrypted Export).
+- **Bitwarden**: same idea — a throwaway vault, Tools → Export Vault → `.json` (unencrypted). Also create one item and set a password-protected export once, specifically to test that Maat rejects it with a clear error instead of crashing.
+- **Generic CSV**: export from Chrome (`chrome://settings/passwords` → ⋮ → Export passwords) or hand-write a CSV with columns `name,url,password,totp,last_modified`.
+- **Questionnaire**: no export needed — just answer with fake account names ("Test Bank", "Test Email").
+
+## Test Cases
+
+### 1. First Launch
+
+- [ ] No vault exists yet → app shows **Create Your Vault**, not Unlock
+- [ ] Type a passphrase under 12 characters → inline error, no crash
+- [ ] Type two different passphrases in the two fields → "Passphrases do not match.", no crash
+- [ ] Type a valid, matching passphrase, click **Create** → lands on Onboarding (graph is empty)
+- [ ] Check the vault path for your OS (above) — a `vault.enc` and `vault.salt` file should now exist there
+- [ ] Open `vault.enc` in a text editor — it should be unreadable binary, not plaintext
+
+### 2. Unlock
+
+- [ ] Close and relaunch the app → shows **Unlock Your Vault**, not Create
+- [ ] Type the wrong passphrase → "Incorrect passphrase.", no crash, still on the unlock screen
+- [ ] Type the correct passphrase → lands on Onboarding/Dashboard depending on whether you've added data yet
+
+### 3. Language and Theme (Welcome Screen)
+
+- [ ] Click **ES** → all text on the welcome screen switches to Spanish immediately, no restart needed
+- [ ] Click **EN** → switches back
+- [ ] Click the dark/light toggle → background and text colors flip, nothing unreadable in either mode
+- [ ] After switching language and/or theme, proceed to create/unlock the vault — the choice should carry through to Onboarding and the Dashboard
+
+### 4. Onboarding — Import (repeat once per password manager)
+
+For each of 1Password / Bitwarden / generic CSV:
+
+- [ ] Click **Import Password Manager** → **Start** → file picker opens
+- [ ] Select your test export → format picker dialog appears with a sensible default guessed from the file extension
+- [ ] Confirm the format, click **Import** → success message shows the account count, and it matches how many items were in your test export
+- [ ] Screen switches to the Dashboard automatically once the graph has data
+- [ ] Select the **wrong** format on purpose (e.g. pick "Bitwarden" for a 1Password file) → should show a clear inline error, not crash
+- [ ] Bitwarden only: try importing a password-protected/encrypted export → clear error telling you to re-export unencrypted, no crash
+
+### 5. Onboarding — Answer Questions
+
+- [ ] Click **Answer Questions** → questionnaire opens on question 1/4
+- [ ] Fill in an account name and criticality, answer all 4 questions, click through with **Next** each time → last step's button says **Finish**
+- [ ] Click **Finish and Return** partway through (after only answering 1-2 questions) → account still gets created with just those answers, no crash
+- [ ] Click **Skip** on a question → that question is left blank for this account, wizard still advances
+- [ ] Click **Back** after answering a question → previous answer is still there, editable
+- [ ] After finishing, Dashboard shows this account reflected in the score/gaps
+
+### 6. Dashboard
+
+- [ ] With at least one imported/answered account, score shows as `NN/100`, never just a bare number with no context
+- [ ] All four component rows are visible with their plain-language one-line explanation
+- [ ] If you set up a scenario matching the PRD example (passkey auth + SMS recovery, or a mutual email/phone recovery cycle, or a lone TOTP factor with no backup) — confirm the matching gap shows up in the list, in plain language, with no metric names or raw numbers
+- [ ] Click **Fix This** on any gap → Remediation screen opens showing that gap's specific runbook
+- [ ] Click **Add More Data** → returns to Onboarding, previously entered data is untouched
+
+### 7. Remediation
+
+- [ ] The before/after numbers shown make sense relative to what's on the Dashboard (i.e. "after" should be ≤ "before")
+- [ ] For a `recovery_asymmetry` or `cycle` gap, the sequencing warning is visible and makes sense
+- [ ] If a deep link button is shown, clicking it opens your **actual default browser** to the real settings page for that provider (only testable if the account's URL matched a recognized provider — google.com, github.com, microsoft.com/outlook.com/live.com, apple.com/icloud.com)
+- [ ] Click **Not Now** → returns to Dashboard, nothing changed
+- [ ] Click **I Completed This** → returns to Dashboard, score/gaps recalculated, and a "Recently Completed" line appears with today's date
+
+### 8. Connect Integration
+
+- [ ] Click **Connect Integration** → **Start** → shows "Coming Soon", does not crash or pretend to connect to anything
+
+### 9. Cross-Platform Specifics
+
+- [ ] Window renders at a reasonable size on first launch on this OS — nothing cut off, no overlapping text
+- [ ] Try a non-100% display scale factor if your OS/monitor supports it (125%, 150%) — same check
+- [ ] Native window chrome (title bar, close/minimize buttons) looks like a normal app on this OS, not visually broken
+- [ ] The vault path from [Setup Per OS](#setup-per-os) is exactly where the files landed — no fallback path was silently used
+
+## What NOT to Report as a Bug
+
+These are known, already-documented gaps (see `README.md`'s Implementation Status section) — please don't file issues for these unless you're seeing something *worse* than "it doesn't exist yet":
+
+- KeePass XML import (not built)
+- Any graph visualization screen (not built)
+- Have I Been Pwned checks (not built — nothing will ever show as "breached" right now)
+- HTML export (not built)
+- Connect Integration doing anything beyond "Coming Soon"
+- Anything related to a published installer or `pip install maat` — there isn't one yet
+
+## Bug Report Template
+
+```
+OS + version:
+Python version (or: PyInstaller binary, version/commit):
+Display scaling (100% / 125% / other):
+Steps to reproduce:
+Expected:
+Actual:
+Screenshot (if visual) — crop out any real account names/URLs:
+```
+
+## Why This Is a Manual Plan, Not an Automated One
+
+Everything in this repo was verified during development with throwaway Python scripts that drove the UI programmatically (calling widget methods directly, not clicking at screen coordinates) and asserted on the results, then deleted themselves — not screenshots. Coordinate-based click automation turned out to be unreliable in the sandboxed environment used to build this (window positions reported by the OS didn't match what was actually on screen), so verification shifted to driving the code directly instead of the pixels. That's real verification of behavior, but it is not the same as a person looking at rendered text on a real monitor, which is what this document is for.
+
+None of those scripts were committed to the repo — there's no `pytest` suite here yet (see `TODO.md`).

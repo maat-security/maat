@@ -20,6 +20,7 @@ Un proyecto open source de Heru · heru.life · Licencia MIT
 - [Principio de Diseño: Local-First, Sin Excepciones](#principio-de-diseño-local-first-sin-excepciones)
 - [El SIM Swap Está en el Modelo](#el-sim-swap-está-en-el-modelo)
 - [Roadmap](#roadmap)
+- [Estado de Implementación](#estado-de-implementación)
 - [Cómo Contribuir](#cómo-contribuir)
 - [Seguridad](#seguridad)
 - [Acerca de](#acerca-de)
@@ -61,34 +62,20 @@ Usá una. Usá las tres. Hacelas en el orden que quieras. Maat construye tu pano
 
 ## Cómo Empezar
 
-> **Pre-alpha.** El instalador y el CLI que siguen son placeholders para el MVP de v1. Nada de esto está publicado todavía.
-
-Instalación (planeada):
+> **Pre-alpha.** Todavía no está publicado como paquete ni como binario — se corre desde el código fuente.
 
 ```bash
-pip install maat
+git clone https://github.com/maat-security/maat.git
+cd maat
+python -m venv .venv
+.venv\Scripts\activate      # macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt
+python src/main.py
 ```
 
-Corré el onboarding usando cualquiera de los tres caminos opcionales — de forma independiente o combinada:
+La app misma te guía por los tres caminos opcionales de onboarding — importar el export de tu gestor de contraseñas, responder el cuestionario guiado, o conectar una integración (todavía no construida; ver [Estado de Implementación](#estado-de-implementación)). Usá uno, usá los tres, en el orden que quieras.
 
-```bash
-# Camino 1: importar el export de tu gestor de contraseñas
-maat import --source 1password export.1pux
-
-# Camino 2: responder el cuestionario guiado
-maat questionnaire
-
-# Camino 3: conectar una integración
-maat connect github
-```
-
-Después mirá tu score de postura y las acciones priorizadas:
-
-```bash
-maat status
-```
-
-Esto llega en v1. Maat está en pre-alpha — todavía no hay una versión instalable.
+`pip install maat` y binarios nativos instalables son los objetivos de v1/v4 del [Roadmap](#roadmap) de abajo, no algo que puedas hacer hoy.
 
 ## Lo Que Nunca Hace
 
@@ -111,6 +98,38 @@ Tu operadora móvil puede sufrir un SIM swap. Maat modela esto y te muestra qué
 - **v2 — Monitoreo de drift:** Re-import periódico, detección de cambios, sesiones de revisión livianas.
 - **v3 — Remediación guiada:** Runbooks específicos por proveedor con advertencias de secuencia, simulación pre/post, verificación vía API.
 - **v4 — Apps de escritorio:** Instaladores nativos para Windows, macOS y Linux. Mismo motor, sin necesidad de terminal.
+
+## Estado de Implementación
+
+_Última actualización: 09/08/2026._ Lo que realmente funciona hoy, contra lo que sigue siendo roadmap.
+
+**Funciona hoy:**
+
+- Bóveda local cifrada — clave derivada de passphrase, nunca se escribe texto plano en disco
+- Motor del grafo de dependencias — validación de nodos/aristas, blast radius, cut vertices, detección de ciclos
+- Score de postura — los cuatro componentes ponderados del spec del producto, con desglose auditable
+- Cuestionario guiado — cuatro preguntas salteables por cuenta, como máquina de estados
+- Import de gestor de contraseñas — 1Password (`.1pux`), Bitwarden (JSON), CSV genérico — con detección de reutilización de passwords en memoria que nunca persiste el valor
+- Remediación guiada — runbooks específicos por proveedor (Google, GitHub, Microsoft, Apple, fallback genérico honesto para el resto), simulación de impacto antes/después, historial de remediaciones auto-reportadas
+- UI bilingüe (inglés/español) y toggle de tema oscuro/claro
+- Shell de escritorio (CustomTkinter) con spec de empaquetado PyInstaller y workflow de CI para 3 sistemas operativos
+
+**Gaps conocidos:**
+
+- El import de KeePass XML no está construido — hoy solo 1Password, Bitwarden y CSV genérico
+- No hay pantalla de visualización del grafo — el grafo existe y se consulta, pero no hay nada que mostrar visualmente todavía
+- No hay suite de tests automatizados commiteada — todo lo de arriba se verificó con scripts descartables durante el desarrollo, no con un suite de `pytest` en el repo
+
+**Sin empezar:**
+
+- Integración con Have I Been Pwned — `metrics.py` ya tiene un atributo `breached` listo para esto; todavía nada lo completa
+- Export a HTML autocontenido
+- Cualquier integración de API de proveedor (GitHub, Google Workspace, Microsoft Entra) — postergado a propósito, para terminar primero el núcleo local-first
+- Monitoreo de drift / sesiones de revisión periódicas (Roadmap v2)
+- Instaladores nativos publicados (Roadmap v4) — el workflow de CI existe pero nunca se disparó con un tag de release real
+- La excepción acotada de remediación automática para escrituras de API mínimas y no destructivas (ej. revocar un PAT vencido de GitHub) — bloqueada hasta tener la integración de arriba
+
+Ver [TODO.md](TODO.md) para la lista priorizada de próximos pasos, y [QA.md](QA.md) para el plan de testeo manual que cubre Windows, macOS y Linux.
 
 ## Cómo Contribuir
 

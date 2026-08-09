@@ -20,6 +20,7 @@ An open source project by Heru · heru.life · MIT License
 - [Design Principle: Local-First, No Exceptions](#design-principle-local-first-no-exceptions)
 - [SIM Swap Is in the Model](#sim-swap-is-in-the-model)
 - [Roadmap](#roadmap)
+- [Implementation Status](#implementation-status)
 - [Contributing](#contributing)
 - [Security](#security)
 - [About](#about)
@@ -61,34 +62,20 @@ Use one. Use all three. Do them in any order. Maat builds your picture from what
 
 ## Getting Started
 
-> **Pre-alpha.** The install path and CLI below are placeholders for the v1 MVP. Nothing here is published yet.
-
-Install (planned):
+> **Pre-alpha.** Not published as a package or a binary yet — run it from source.
 
 ```bash
-pip install maat
+git clone https://github.com/maat-security/maat.git
+cd maat
+python -m venv .venv
+.venv\Scripts\activate      # macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt
+python src/main.py
 ```
 
-Run onboarding using any of the three optional paths — independently or combined:
+The app itself walks you through the three optional onboarding paths — import a password manager export, answer the guided questionnaire, or connect an integration (not built yet; see [Implementation Status](#implementation-status)). Use one, use all three, in any order.
 
-```bash
-# Path 1: import your password manager export
-maat import --source 1password export.1pux
-
-# Path 2: answer the guided questionnaire
-maat questionnaire
-
-# Path 3: connect an integration
-maat connect github
-```
-
-Then view your posture score and prioritized actions:
-
-```bash
-maat status
-```
-
-This is coming in v1. Maat is pre-alpha — there is no installable release yet.
+`pip install maat` and prebuilt native binaries are the v1/v4 goals in the [Roadmap](#roadmap) below, not something you can do today.
 
 ## What It Never Does
 
@@ -111,6 +98,38 @@ Your mobile carrier can be SIM-swapped. Maat models this and shows you which acc
 - **v2 — Drift monitoring:** Periodic re-import, change detection, lightweight review sessions.
 - **v3 — Guided remediation:** Provider-specific runbooks with sequencing warnings, pre/post simulation, API-based verification.
 - **v4 — Desktop apps:** Native installers for Windows, macOS, and Linux. Same engine, no terminal required.
+
+## Implementation Status
+
+_Last updated 2026-08-09._ What's real and running today, versus what's still on the roadmap above.
+
+**Working now:**
+
+- Encrypted local vault — passphrase-derived key, no plaintext ever written to disk
+- Dependency graph engine — node/edge validation, blast radius, cut vertices, cycle detection
+- Posture scoring — the four weighted components from the product spec, with an auditable breakdown
+- Guided questionnaire — four skippable questions per account, state-machine driven
+- Password manager import — 1Password (`.1pux`), Bitwarden (JSON), generic CSV — with in-memory password-reuse detection that never persists a password value
+- Guided remediation — provider-aware runbooks (Google, GitHub, Microsoft, Apple, honest generic fallback otherwise), before/after impact simulation, self-reported completion history
+- Bilingual UI (English/Spanish) and a dark/light theme toggle
+- Desktop shell (CustomTkinter) with a PyInstaller packaging spec and a three-OS CI build workflow
+
+**Known gaps:**
+
+- KeePass XML import isn't built — only 1Password, Bitwarden, and generic CSV today
+- No graph visualization screen — the graph exists and is queried, but there's nothing to look at yet
+- No committed automated test suite — everything above has been verified with throwaway scripts during development, not a checked-in `pytest` suite
+
+**Not started:**
+
+- Have I Been Pwned integration — `metrics.py` already has a `breached` attribute ready for it; nothing populates it yet
+- Self-contained HTML export
+- Any provider API integration (GitHub, Google Workspace, Microsoft Entra) — deferred on purpose, in favor of finishing the local-first core first
+- Drift monitoring / periodic review sessions (Roadmap v2)
+- Published native installers (Roadmap v4) — the CI workflow exists but has never been triggered by a real release tag
+- The narrow automated-remediation exception for minimal-scope, non-destructive API writes (e.g. revoking an expired GitHub PAT) — blocked on the integration point above
+
+See [TODO.md](TODO.md) for the prioritized next-work list, and [QA.md](QA.md) for the manual test plan covering Windows, macOS, and Linux.
 
 ## Contributing
 
