@@ -166,6 +166,35 @@ _ES = {
     ),
     "No urgent gaps found.": "No se encontraron gaps urgentes.",
     "Graph coverage: {known}/{total}": "Cobertura del grafo: {known}/{total}",
+    "Fix This": "Arreglar Esto",
+    "Recently Completed": "Completado Recientemente",
+
+    # Remediation
+    (
+        "Right now, your single riskiest point exposes {before} "
+        "account{before_s}. Completing this drops that to {after} "
+        "account{after_s}."
+    ): (
+        "En este momento, tu punto más riesgoso expone {before} "
+        "cuenta{before_s}. Completar esto lo reduce a {after} "
+        "cuenta{after_s}."
+    ),
+    (
+        "Completing this closes a real gap, though it isn't your single "
+        "riskiest point right now."
+    ): (
+        "Completar esto cierra un gap real, aunque no sea tu punto más "
+        "riesgoso en este momento."
+    ),
+    (
+        "No specific steps yet — use this account's own security settings."
+    ): (
+        "Todavía no hay pasos específicos — usá la configuración de "
+        "seguridad propia de esta cuenta."
+    ),
+    "Open Settings Page": "Abrir Página de Configuración",
+    "Not Now": "Ahora No",
+    "I Completed This": "Ya Hice Esto",
 }
 
 TRANSLATIONS = {"es": _ES}

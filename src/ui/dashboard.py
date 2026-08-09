@@ -15,6 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import graph  # noqa: E402
 import metrics  # noqa: E402
+import remediation  # noqa: E402
 import store  # noqa: E402
 import theme  # noqa: E402
 from i18n import t  # noqa: E402
@@ -48,10 +49,11 @@ def _component_labels() -> dict:
 class DashboardFrame(ctk.CTkFrame):
     """The main posture screen: score breakdown + prioritized gaps."""
 
-    def __init__(self, master, on_add_data):
+    def __init__(self, master, on_add_data, on_view_remediation=None):
         colors = theme.current()
         super().__init__(master, fg_color=colors["bg"])
         self._on_add_data = on_add_data
+        self._on_view_remediation = on_view_remediation
         self._build(colors)
 
     def _build(self, colors: dict) -> None:
@@ -77,6 +79,7 @@ class DashboardFrame(ctk.CTkFrame):
             gaps = metrics.get_prioritized_gaps(current_graph)
             self._build_score_section(colors, score)
             self._build_gaps_section(colors, gaps)
+            self._build_history_section(colors)
 
         ctk.CTkButton(
             self,
@@ -153,14 +156,53 @@ class DashboardFrame(ctk.CTkFrame):
                 corner_radius=8,
             )
             row.pack(fill="x", pady=4)
+
+            inner = ctk.CTkFrame(row, fg_color="transparent")
+            inner.pack(fill="x", padx=14, pady=10)
+
             ctk.CTkLabel(
-                row,
+                inner,
                 text=gap["description"],
                 text_color=colors["text_primary"],
+                wraplength=440,
+                justify="left",
+                anchor="w",
+            ).pack(side="left", fill="x", expand=True)
+
+            if self._on_view_remediation is not None:
+                ctk.CTkButton(
+                    inner,
+                    text=t("Fix This"),
+                    fg_color=theme.GOLD,
+                    text_color="#1A1A1A",
+                    hover_color=theme.GOLD_HOVER,
+                    width=90,
+                    command=lambda g=gap: self._on_view_remediation(g),
+                ).pack(side="right", padx=(10, 0))
+
+    def _build_history_section(self, colors: dict) -> None:
+        history = remediation.get_completed_history()
+        if not history:
+            return
+
+        ctk.CTkLabel(
+            self,
+            text=t("Recently Completed"),
+            text_color=colors["text_secondary"],
+            font=ctk.CTkFont(size=12, weight="bold"),
+        ).pack(pady=(4, 2), padx=30, anchor="w")
+
+        for record in history[-3:][::-1]:
+            date_text = record.get("completed_at", "")[:10]
+            ctk.CTkLabel(
+                self,
+                text=f"✓ {record.get('description', '')}  ({date_text})",
+                text_color=colors["text_secondary"],
+                font=ctk.CTkFont(size=11),
                 wraplength=560,
                 justify="left",
                 anchor="w",
-            ).pack(fill="x", padx=14, pady=10)
+            ).pack(padx=30, anchor="w")
 
 
 class StatusBarFrame(ctk.CTkFrame):

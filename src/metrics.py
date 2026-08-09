@@ -118,6 +118,16 @@ def _is_stale(last_verified) -> bool:
 # Score components
 # --------------------------------------------------------------------------
 
+def worst_case_exposure(graph: nx.DiGraph) -> int:
+    """Return how many identities the single worst node in the graph
+    would expose — the same figure the concentration component and
+    get_prioritized_gaps() are built on. Used by remediation.py to show
+    a before/after simulation without duplicating this computation.
+    """
+    _, detail = _compute_concentration(graph)
+    return len(detail["exposed_identities"])
+
+
 def _compute_concentration(graph: nx.DiGraph) -> tuple:
     """(score_0_100, detail) — how much falls if the single worst node
     in the whole graph (any node type) is compromised or lost."""

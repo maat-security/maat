@@ -29,6 +29,7 @@ from i18n import t, get_locale, set_locale, LOCALES  # noqa: E402
 from ui.dashboard import DashboardFrame  # noqa: E402
 from ui.onboarding import OnboardingFrame  # noqa: E402
 from ui.questionnaire import QuestionnaireFrame  # noqa: E402
+from ui.remediation import RemediationFrame  # noqa: E402
 
 WINDOW_TITLE = "Maat — Your identity, in balance"
 
@@ -70,7 +71,13 @@ class MaatApp(ctk.CTk):
         this is called, so finishing an import or a questionnaire pass
         naturally flips from one to the other."""
         if graph.get_graph().number_of_nodes() > 0:
-            self._swap_frame(DashboardFrame(self, on_add_data=self._show_onboarding))
+            self._swap_frame(
+                DashboardFrame(
+                    self,
+                    on_add_data=self._show_onboarding,
+                    on_view_remediation=self._show_remediation,
+                )
+            )
         else:
             self._swap_frame(self._build_onboarding_frame())
 
@@ -86,6 +93,9 @@ class MaatApp(ctk.CTk):
 
     def _show_questionnaire(self) -> None:
         self._swap_frame(QuestionnaireFrame(self, on_done=self._show_main_screen))
+
+    def _show_remediation(self, gap: dict) -> None:
+        self._swap_frame(RemediationFrame(self, gap, on_done=self._show_main_screen))
 
 
 class WelcomeFrame(ctk.CTkFrame):
