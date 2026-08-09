@@ -1,0 +1,51 @@
+name: Build Release Binaries
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            asset_name: maat-windows.exe
+            build_output: dist/maat.exe
+          - os: macos-latest
+            asset_name: maat-macos
+            build_output: dist/maat
+          - os: ubuntu-latest
+            asset_name: maat-linux
+            build_output: dist/maat
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt pyinstaller
+
+      - name: Build binary with PyInstaller
+        run: pyinstaller build.spec
+
+      - name: Rename binary for release
+        shell: bash
+        run: cp "${{ matrix.build_output }}" "${{ matrix.asset_name }}"
+
+      - name: Upload binary to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ matrix.asset_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

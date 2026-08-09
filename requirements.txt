@@ -1,0 +1,8 @@
+customtkinter
+networkx
+cryptography
+requests
+
+# PyInstaller packages release binaries in CI (see .github/workflows/build.yml).
+# It is not a runtime dependency of the app itself — install it separately:
+# pip install pyinstaller
