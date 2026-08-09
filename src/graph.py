@@ -28,6 +28,8 @@ Never store secret values (passwords, TOTP seeds, recovery codes) as
 attributes — add_node() refuses any attribute key that looks like one.
 """
 
+import re
+
 import networkx as nx
 
 NODE_TYPES = {
@@ -86,6 +88,24 @@ def factor_resistance_rank(kind: str) -> int:
     honest degradation, per design principle 7.
     """
     return FACTOR_RESISTANCE.get(kind, 0)
+
+
+def make_node_id(display_name: str) -> str:
+    """Derive a graph node id from a free-text display name.
+
+    Lowercases and collapses non-alphanumerics to hyphens. If the
+    resulting id already belongs to a node with a *different*
+    display_name, appends a numeric suffix instead of colliding with
+    it — two distinct accounts that happen to slugify the same way
+    (e.g. two accounts both named "Bank") stay distinct nodes.
+    """
+    base = re.sub(r"[^a-z0-9]+", "-", display_name.strip().lower()).strip("-") or "account"
+    candidate = base
+    suffix = 2
+    while candidate in _graph.nodes and _graph.nodes[candidate].get("display_name") != display_name:
+        candidate = f"{base}-{suffix}"
+        suffix += 1
+    return candidate
 
 
 def add_node(node_id: str, node_type: str, attributes: dict) -> None:

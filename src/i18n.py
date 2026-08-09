@@ -90,6 +90,82 @@ _ES = {
     "Close": "Cerrar",
     "Vault": "Bóveda",
     "Graph coverage: —": "Cobertura del grafo: —",
+
+    # Onboarding
+    "Add your first accounts to see where you stand.": "Agregá tus primeras cuentas para ver dónde estás parado.",
+    "Start": "Empezar",
+    "Select your password manager export": "Seleccioná el export de tu gestor de contraseñas",
+    "Supported exports": "Exports soportados",
+    "All files": "Todos los archivos",
+    "Confirm Format": "Confirmar Formato",
+    "Which password manager is this export from?": "¿De qué gestor de contraseñas es este export?",
+    "Import": "Importar",
+    "Imported {n} account{s}.": "Se importaron {n} cuenta{s}.",
+
+    # Questionnaire
+    "Account name (e.g. Gmail)": "Nombre de la cuenta (ej. Gmail)",
+    (
+        "How critical is this account? 5 = most critical (financial, primary email)"
+    ): (
+        "¿Qué tan crítica es esta cuenta? 5 = más crítica (financiera, correo principal)"
+    ),
+    "Back": "Atrás",
+    "Skip": "Saltear",
+    "Next": "Siguiente",
+    "Finish": "Terminar",
+    "Finish and Return": "Terminar y Volver",
+    "How do you normally sign in to this account?": "¿Cómo entrás normalmente a esta cuenta?",
+    "Password": "Contraseña",
+    "SMS": "SMS",
+    "Push notification": "Notificación push",
+    "TOTP app": "App de TOTP",
+    "Biometric": "Biometría",
+    "Passkey": "Passkey",
+    "Hardware security key": "Llave de seguridad física",
+    "If you lost that, how would you get back in?": "Si perdieras eso, ¿cómo volverías a entrar?",
+    "Optional detail (e.g. which phone number)": "Detalle opcional (ej. qué número de teléfono)",
+    "Backup email": "Correo alternativo",
+    "Phone number": "Número de teléfono",
+    "Recovery codes": "Códigos de recuperación",
+    "Something else": "Otra cosa",
+    "How is that recovery method itself protected?": "¿Cómo protegés ese método de recuperación?",
+    (
+        "Where do backup codes or your second-factor backup live?"
+    ): (
+        "¿Dónde viven los códigos de respaldo o el backup de tu segundo factor?"
+    ),
+    "e.g. printed in a drawer, in my password manager": "ej. impreso en un cajón, en mi gestor de contraseñas",
+    (
+        "Describe where — never enter the actual codes."
+    ): (
+        "Describí dónde — nunca ingreses los códigos reales."
+    ),
+
+    # Dashboard
+    "Concentration": "Concentración",
+    (
+        "How much falls if your single riskiest point is compromised"
+    ): (
+        "Cuánto cae si se compromete tu punto más riesgoso"
+    ),
+    "Factor Resistance": "Resistencia de Factores",
+    "How well your critical accounts resist phishing": "Qué tan bien resisten phishing tus cuentas críticas",
+    "Recovery Hygiene": "Higiene de Recuperación",
+    (
+        "Whether your backdoors are weaker than your front doors"
+    ): (
+        "Si tus puertas traseras son más débiles que las principales"
+    ),
+    "Exposure and Freshness": "Exposición y Frescura",
+    "Whether there are known breaches or stale data": "Si hay breaches conocidos o datos desactualizados",
+    "Add More Data": "Agregar Más Datos",
+    (
+        "Your graph is empty. Add a few accounts to see your first result."
+    ): (
+        "Tu grafo está vacío. Agregá algunas cuentas para ver tu primer resultado."
+    ),
+    "No urgent gaps found.": "No se encontraron gaps urgentes.",
+    "Graph coverage: {known}/{total}": "Cobertura del grafo: {known}/{total}",
 }
 
 TRANSLATIONS = {"es": _ES}

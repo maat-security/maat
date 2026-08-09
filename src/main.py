@@ -1,9 +1,10 @@
 """Maat desktop application entry point.
 
-Phase 0: window shell, the unified welcome screen (intro + language and
-appearance controls + vault creation/unlock), and the three-panel
-onboarding launcher. No graph or scoring logic yet — every panel button
-opens a "coming soon" placeholder.
+Window shell, the unified welcome screen (intro + language and
+appearance controls + vault creation/unlock), and navigation between
+onboarding, the guided questionnaire, and the posture dashboard. The
+dashboard and onboarding frames themselves live in ui/ — this module
+only owns which one is on screen.
 """
 
 import sys
@@ -21,9 +22,13 @@ ctk.deactivate_automatic_dpi_awareness()
 # whether this file is launched directly or via PyInstaller's bootloader.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import store  # noqa: E402  (import must follow the sys.path insert above)
+import graph  # noqa: E402  (import must follow the sys.path insert above)
+import store  # noqa: E402
 import theme  # noqa: E402
 from i18n import t, get_locale, set_locale, LOCALES  # noqa: E402
+from ui.dashboard import DashboardFrame  # noqa: E402
+from ui.onboarding import OnboardingFrame  # noqa: E402
+from ui.questionnaire import QuestionnaireFrame  # noqa: E402
 
 WINDOW_TITLE = "Maat — Your identity, in balance"
 
@@ -57,10 +62,30 @@ class MaatApp(ctk.CTk):
         self._current_frame.pack(fill="both", expand=True)
 
     def _show_welcome_screen(self) -> None:
-        self._swap_frame(WelcomeFrame(self, on_ready=self._show_dashboard))
+        self._swap_frame(WelcomeFrame(self, on_ready=self._show_main_screen))
 
-    def _show_dashboard(self) -> None:
-        self._swap_frame(DashboardShellFrame(self))
+    def _show_main_screen(self) -> None:
+        """Show the dashboard if the graph has anything in it yet,
+        otherwise the onboarding entry point. Re-evaluated every time
+        this is called, so finishing an import or a questionnaire pass
+        naturally flips from one to the other."""
+        if graph.get_graph().number_of_nodes() > 0:
+            self._swap_frame(DashboardFrame(self, on_add_data=self._show_onboarding))
+        else:
+            self._swap_frame(self._build_onboarding_frame())
+
+    def _show_onboarding(self) -> None:
+        self._swap_frame(self._build_onboarding_frame())
+
+    def _build_onboarding_frame(self) -> OnboardingFrame:
+        return OnboardingFrame(
+            self,
+            on_import_done=self._show_main_screen,
+            on_answer_questions=self._show_questionnaire,
+        )
+
+    def _show_questionnaire(self) -> None:
+        self._swap_frame(QuestionnaireFrame(self, on_done=self._show_main_screen))
 
 
 class WelcomeFrame(ctk.CTkFrame):
@@ -282,134 +307,6 @@ class WelcomeFrame(ctk.CTkFrame):
         ctk.set_appearance_mode(new_mode)
         self.master.configure(fg_color=theme.current()["bg"])
         self._rebuild()
-
-
-class DashboardShellFrame(ctk.CTkFrame):
-    """Post-unlock main screen: the three onboarding-path panels and the
-    status bar. No business logic — buttons open placeholder dialogs."""
-
-    def __init__(self, master):
-        colors = theme.current()
-        super().__init__(master, fg_color=colors["bg"])
-
-        # Built per-instance (not as a class-level constant) so this
-        # picks up whatever locale is active right now, including a
-        # switch made moments earlier on the welcome screen.
-        panels = (
-            (t("Import Password Manager"), t("Bring in your account inventory")),
-            (t("Answer Questions"), t("Map how you authenticate and recover access")),
-            (t("Connect Integration"), t("Let Maat read your configuration directly")),
-        )
-
-        ctk.CTkLabel(
-            self,
-            text=t("Maat"),
-            text_color=theme.GOLD,
-            font=ctk.CTkFont(size=26, weight="bold"),
-        ).pack(pady=(30, 4))
-
-        ctk.CTkLabel(
-            self,
-            text=t("Your identity, in balance."),
-            text_color=colors["text_secondary"],
-        ).pack(pady=(0, 30))
-
-        panels_container = ctk.CTkFrame(self, fg_color="transparent")
-        panels_container.pack(pady=10, padx=20, fill="both", expand=True)
-        panels_container.grid_columnconfigure((0, 1, 2), weight=1)
-        panels_container.grid_rowconfigure(0, weight=1)
-
-        for index, (label, description) in enumerate(panels):
-            self._build_panel(panels_container, colors, label, description, column=index)
-
-        self._status_bar = StatusBarFrame(self)
-        self._status_bar.pack(side="bottom", fill="x")
-
-    def _build_panel(self, container, colors, label, description, column):
-        panel = ctk.CTkFrame(
-            container,
-            fg_color=colors["card_bg"],
-            border_color=theme.GOLD,
-            border_width=1,
-            corner_radius=10,
-        )
-        panel.grid(row=0, column=column, padx=12, pady=10, sticky="nsew")
-
-        ctk.CTkLabel(
-            panel,
-            text=label,
-            text_color=colors["text_primary"],
-            font=ctk.CTkFont(size=15, weight="bold"),
-            wraplength=220,
-        ).pack(pady=(24, 8), padx=16)
-
-        ctk.CTkLabel(
-            panel,
-            text=description,
-            text_color=colors["text_secondary"],
-            wraplength=220,
-        ).pack(pady=(0, 20), padx=16)
-
-        ctk.CTkButton(
-            panel,
-            text=t("Coming Soon"),
-            fg_color=theme.GOLD,
-            text_color="#1A1A1A",
-            hover_color=theme.GOLD_HOVER,
-            command=lambda: self._show_coming_soon(colors, label),
-        ).pack(pady=(0, 24), padx=16)
-
-    def _show_coming_soon(self, colors, panel_label: str) -> None:
-        dialog = ctk.CTkToplevel(self)
-        dialog.title(t("Coming Soon"))
-        dialog.geometry("360x160")
-        dialog.configure(fg_color=colors["bg"])
-        dialog.resizable(False, False)
-        dialog.grab_set()
-
-        ctk.CTkLabel(
-            dialog,
-            text=panel_label,
-            text_color=theme.GOLD,
-            font=ctk.CTkFont(size=16, weight="bold"),
-        ).pack(pady=(24, 8))
-
-        ctk.CTkLabel(
-            dialog,
-            text=t("This is coming in a future phase."),
-            text_color=colors["text_primary"],
-        ).pack(pady=(0, 20))
-
-        ctk.CTkButton(
-            dialog,
-            text=t("Close"),
-            fg_color=theme.GOLD,
-            text_color="#1A1A1A",
-            hover_color=theme.GOLD_HOVER,
-            command=dialog.destroy,
-        ).pack()
-
-
-class StatusBarFrame(ctk.CTkFrame):
-    """Bottom status bar: vault path and graph coverage placeholder."""
-
-    def __init__(self, master):
-        colors = theme.current()
-        super().__init__(master, fg_color=colors["card_bg"], height=28, corner_radius=0)
-
-        vault_path = str(store.get_vault_path())
-
-        ctk.CTkLabel(
-            self,
-            text=f"{t('Vault')}: {vault_path}",
-            text_color=colors["text_secondary"],
-        ).pack(side="left", padx=12, pady=4)
-
-        ctk.CTkLabel(
-            self,
-            text=t("Graph coverage: —"),
-            text_color=colors["text_secondary"],
-        ).pack(side="right", padx=12, pady=4)
 
 
 def main() -> None:
