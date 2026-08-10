@@ -176,6 +176,24 @@ _ES = {
     "Graph coverage: {known}/{total}": "Cobertura del grafo: {known}/{total}",
     "Fix This": "Arreglar Esto",
     "Recently Completed": "Completado Recientemente",
+    "Export Report": "Exportar Reporte",
+    "Save your posture report": "Guardá tu reporte de postura",
+    "Report saved.": "Reporte guardado.",
+    "Could not save the report: {error}": "No se pudo guardar el reporte: {error}",
+
+    # HTML export (src/export.py)
+    "Posture Report": "Reporte de Postura",
+    "Generated": "Generado",
+    "Prioritized Actions": "Acciones Priorizadas",
+    (
+        "This file was generated locally and contains no passwords, "
+        "TOTP seeds, or recovery codes. It never leaves this device "
+        "unless you send it yourself."
+    ): (
+        "Este archivo se generó localmente y no contiene passwords, "
+        "seeds de TOTP, ni códigos de recuperación. Nunca sale de este "
+        "dispositivo a menos que lo envíes vos mismo."
+    ),
 
     # Remediation
     (

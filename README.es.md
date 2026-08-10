@@ -112,6 +112,7 @@ _Última actualización: 09/08/2026._ Lo que realmente funciona hoy, contra lo q
 - Import de gestor de contraseñas — 1Password (`.1pux`), Bitwarden (JSON), CSV genérico — con detección de reutilización de passwords y chequeo de Have I Been Pwned en memoria, ninguno de los dos persiste el valor de la password
 - Integración con Have I Been Pwned — chequeo k-anonymity contra Pwned Passwords (solo un prefijo de 5 caracteres del hash sale del dispositivo), corre en un hilo de fondo durante el import, aparece como gap priorizado ("esta password está filtrada") con su propio runbook de remediación
 - Remediación guiada — runbooks específicos por proveedor (Google, GitHub, Microsoft, Apple, fallback genérico honesto para el resto), simulación de impacto antes/después, historial de remediaciones auto-reportadas
+- Export a HTML autocontenido — score, desglose, gaps priorizados e historial de remediaciones en un solo archivo estático, sin recursos externos y sin secretos, guardado donde el usuario elija
 - UI bilingüe (inglés/español) y toggle de tema oscuro/claro
 - Shell de escritorio (CustomTkinter) con spec de empaquetado PyInstaller y workflow de CI para 3 sistemas operativos
 
@@ -123,7 +124,6 @@ _Última actualización: 09/08/2026._ Lo que realmente funciona hoy, contra lo q
 
 **Sin empezar:**
 
-- Export a HTML autocontenido
 - Cualquier integración de API de proveedor (GitHub, Google Workspace, Microsoft Entra) — postergado a propósito, para terminar primero el núcleo local-first
 - Monitoreo de drift / sesiones de revisión periódicas (Roadmap v2)
 - Instaladores nativos publicados (Roadmap v4) — el workflow de CI existe pero nunca se disparó con un tag de release real

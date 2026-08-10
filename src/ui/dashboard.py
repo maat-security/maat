@@ -7,12 +7,14 @@ yet: "no data" and "bad posture" are not the same thing.
 """
 
 import sys
+import tkinter.filedialog as filedialog
 from pathlib import Path
 
 import customtkinter as ctk
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+import export  # noqa: E402
 import graph  # noqa: E402
 import metrics  # noqa: E402
 import remediation  # noqa: E402
@@ -72,7 +74,9 @@ class DashboardFrame(ctk.CTkFrame):
             text_color=colors["text_secondary"],
         ).pack(pady=(0, 12))
 
-        if current_graph.number_of_nodes() == 0:
+        has_data = current_graph.number_of_nodes() > 0
+
+        if not has_data:
             self._build_empty_state(colors)
         else:
             score = metrics.compute_score(current_graph)
@@ -81,17 +85,53 @@ class DashboardFrame(ctk.CTkFrame):
             self._build_gaps_section(colors, gaps)
             self._build_history_section(colors)
 
+        button_row = ctk.CTkFrame(self, fg_color="transparent")
+        button_row.pack(pady=(4, 4))
+
         ctk.CTkButton(
-            self,
+            button_row,
             text=t("Add More Data"),
             fg_color=theme.GOLD,
             text_color="#1A1A1A",
             hover_color=theme.GOLD_HOVER,
             command=self._on_add_data,
             width=200,
-        ).pack(pady=(4, 12))
+        ).pack(side="left", padx=6)
+
+        if has_data:
+            ctk.CTkButton(
+                button_row,
+                text=t("Export Report"),
+                fg_color=colors["card_bg"],
+                text_color=colors["text_primary"],
+                hover_color=theme.GOLD_HOVER,
+                command=self._on_export_report,
+                width=160,
+            ).pack(side="left", padx=6)
+
+        self._export_status_label = ctk.CTkLabel(self, text="", text_color=colors["text_secondary"])
+        self._export_status_label.pack(pady=(0, 8))
 
         StatusBarFrame(self).pack(side="bottom", fill="x")
+
+    def _on_export_report(self) -> None:
+        filepath = filedialog.asksaveasfilename(
+            title=t("Save your posture report"),
+            defaultextension=".html",
+            filetypes=[("HTML", "*.html"), (t("All files"), "*.*")],
+        )
+        if not filepath:
+            return
+
+        try:
+            export.export_to_file(
+                graph.get_graph(), filepath, history=remediation.get_completed_history(),
+            )
+        except OSError as exc:
+            self._export_status_label.configure(text=t("Could not save the report: {error}").format(error=exc))
+            return
+
+        self._export_status_label.configure(text=t("Report saved."))
 
     def _build_empty_state(self, colors: dict) -> None:
         ctk.CTkLabel(
