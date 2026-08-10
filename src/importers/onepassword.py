@@ -11,7 +11,7 @@ and reuse — never included in parse()'s return value.
 import json
 import zipfile
 
-from ._shared import compute_reuse_flags, days_since, new_account
+from ._shared import compute_breach_flags, compute_reuse_flags, days_since, new_account
 
 
 def parse(filepath: str) -> list:
@@ -73,6 +73,11 @@ def parse(filepath: str) -> list:
     reuse_flags = compute_reuse_flags(passwords)
     for account, reused in zip(accounts, reuse_flags):
         account["password_reused"] = reused
+
+    breached_flags, failed_flags = compute_breach_flags(passwords)
+    for account, breached, failed in zip(accounts, breached_flags, failed_flags):
+        account["breached"] = breached
+        account["breach_check_failed"] = failed
 
     return accounts
 

@@ -9,16 +9,21 @@ Every importer returns the same account dict shape:
     "has_passkey": bool,
     "password_age_days": int | None,   # None means unknown, not zero
     "password_reused": bool,
+    "breached": bool,                  # confirmed via Have I Been Pwned
+    "breach_check_failed": bool,       # True if that check couldn't run
   }
 
 Passwords are only ever held in memory long enough to hash them for
-reuse detection within a single parse() call — the plaintext, and even
-the hash, are discarded before parse() returns. Nothing here persists
-a secret value; only the derived structural facts above do.
+reuse detection and the Have I Been Pwned lookup within a single
+parse() call — the plaintext, and even the hashes, are discarded
+before parse() returns. Nothing here persists a secret value; only the
+derived structural facts above do.
 """
 
 import datetime
 import hashlib
+
+import hibp
 
 
 def new_account(
@@ -28,6 +33,8 @@ def new_account(
     has_passkey=False,
     password_age_days=None,
     password_reused=False,
+    breached=False,
+    breach_check_failed=False,
 ):
     """Build an account dict with the shape every importer must return."""
     return {
@@ -37,6 +44,8 @@ def new_account(
         "has_passkey": has_passkey,
         "password_age_days": password_age_days,
         "password_reused": password_reused,
+        "breached": breached,
+        "breach_check_failed": breach_check_failed,
     }
 
 
@@ -84,3 +93,31 @@ def compute_reuse_flags(passwords):
         if h is not None:
             counts[h] = counts.get(h, 0) + 1
     return [h is not None and counts[h] > 1 for h in hashes]
+
+
+def compute_breach_flags(passwords):
+    """Given a list of password strings (or None) in item order, return
+    (breached_flags, failed_flags) — two same-length lists of booleans.
+
+    breached_flags[i] is True only when Have I Been Pwned's k-anonymity
+    range check actually confirmed that password's hash is breached.
+    failed_flags[i] is True when that item had a password but the
+    check couldn't complete (e.g. no network) — a missing password is
+    never "failed", same as it's never "breached": there was nothing
+    to check.
+
+    A failure partway through degrades the *whole batch* to
+    unconfirmed (breached=False, failed=True for every item that had a
+    password) rather than raising and losing an otherwise-successful
+    import — see hibp.py for why "couldn't check" and "confirmed clean"
+    are kept as distinct claims here rather than collapsed into one.
+    """
+    had_password = [bool(p) for p in passwords]
+    if not any(had_password):
+        return [False] * len(passwords), [False] * len(passwords)
+
+    try:
+        breached = hibp.check_passwords_breached(passwords)
+        return breached, [False] * len(passwords)
+    except hibp.HibpError:
+        return [False] * len(passwords), had_password

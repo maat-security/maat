@@ -64,6 +64,7 @@ Don't use your real accounts. Options:
 - **Bitwarden**: same idea — a throwaway vault, Tools → Export Vault → `.json` (unencrypted). Also create one item and set a password-protected export once, specifically to test that Maat rejects it with a clear error instead of crashing.
 - **Generic CSV**: export from Chrome (`chrome://settings/passwords` → ⋮ → Export passwords) or hand-write a CSV with columns `name,url,password,totp,last_modified`.
 - **Questionnaire**: no export needed — just answer with fake account names ("Test Bank", "Test Email").
+- **For the Have I Been Pwned check** (any import method): give at least one throwaway fake login a well-known breached password (e.g. `password123`, `qwerty123`) and at least one a long random string you generate yourself — the first should come back flagged, the second should not. Never use a real password you actually use anywhere, even a throwaway account's — the whole point of the k-anonymity design is that Maat doesn't need you to trust it with the real thing.
 
 ## Test Cases
 
@@ -95,8 +96,12 @@ For each of 1Password / Bitwarden / generic CSV:
 
 - [ ] Click **Import Password Manager** → **Start** → file picker opens
 - [ ] Select your test export → format picker dialog appears with a sensible default guessed from the file extension
-- [ ] Confirm the format, click **Import** → success message shows the account count, and it matches how many items were in your test export
+- [ ] Click **Import** → button switches to "Importing…" and becomes unclickable while it runs, and the rest of the window stays responsive (drag it around) instead of freezing — this is the Have I Been Pwned network check running in the background
+- [ ] Once it finishes: success message shows the account count, and it matches how many items were in your test export
 - [ ] Screen switches to the Dashboard automatically once the graph has data
+- [ ] The account you gave a known-breached test password (see [Test Data](#test-data)) shows a "password has appeared in a known data breach" gap on the Dashboard; the account with the random password does not
+- [ ] Click **Fix This** on the breach gap → Remediation screen shows the "change its password now" runbook; click **I Completed This** → back on the Dashboard, that gap is gone
+- [ ] Turn off your network connection, then re-import a fresh test export → import still completes (accounts show up), but the success message also says it couldn't check for breaches — no crash, and nothing gets silently marked as clean
 - [ ] Select the **wrong** format on purpose (e.g. pick "Bitwarden" for a 1Password file) → should show a clear inline error, not crash
 - [ ] Bitwarden only: try importing a password-protected/encrypted export → clear error telling you to re-export unencrypted, no crash
 
@@ -142,7 +147,6 @@ These are known, already-documented gaps (see `README.md`'s Implementation Statu
 
 - KeePass XML import (not built)
 - Any graph visualization screen (not built)
-- Have I Been Pwned checks (not built — nothing will ever show as "breached" right now)
 - HTML export (not built)
 - Connect Integration doing anything beyond "Coming Soon"
 - Anything related to a published installer or `pip install maat` — there isn't one yet

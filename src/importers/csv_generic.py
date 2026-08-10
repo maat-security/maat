@@ -11,7 +11,7 @@ represented in plain CSV exports, so has_passkey is always False here.
 
 import csv
 
-from ._shared import compute_reuse_flags, days_since, new_account
+from ._shared import compute_breach_flags, compute_reuse_flags, days_since, new_account
 
 NAME_COLUMNS = ("name", "title", "account", "item name")
 URL_COLUMNS = ("url", "website", "login_uri", "site")
@@ -78,5 +78,10 @@ def parse(filepath: str) -> list:
     reuse_flags = compute_reuse_flags(passwords)
     for account, reused in zip(accounts, reuse_flags):
         account["password_reused"] = reused
+
+    breached_flags, failed_flags = compute_breach_flags(passwords)
+    for account, breached, failed in zip(accounts, breached_flags, failed_flags):
+        account["breached"] = breached
+        account["breach_check_failed"] = failed
 
     return accounts

@@ -109,7 +109,8 @@ _Last updated 2026-08-09._ What's real and running today, versus what's still on
 - Dependency graph engine — node/edge validation, blast radius, cut vertices, cycle detection
 - Posture scoring — the four weighted components from the product spec, with an auditable breakdown
 - Guided questionnaire — four skippable questions per account, state-machine driven
-- Password manager import — 1Password (`.1pux`), Bitwarden (JSON), generic CSV — with in-memory password-reuse detection that never persists a password value
+- Password manager import — 1Password (`.1pux`), Bitwarden (JSON), generic CSV — with in-memory password-reuse detection and a Have I Been Pwned breach check, neither of which ever persists a password value
+- Have I Been Pwned integration — k-anonymity Pwned Passwords check (only a 5-character hash prefix ever leaves the device), run in a background thread during import, surfaced as a prioritized "this password is breached" gap with its own remediation runbook
 - Guided remediation — provider-aware runbooks (Google, GitHub, Microsoft, Apple, honest generic fallback otherwise), before/after impact simulation, self-reported completion history
 - Bilingual UI (English/Spanish) and a dark/light theme toggle
 - Desktop shell (CustomTkinter) with a PyInstaller packaging spec and a three-OS CI build workflow
@@ -122,7 +123,6 @@ _Last updated 2026-08-09._ What's real and running today, versus what's still on
 
 **Not started:**
 
-- Have I Been Pwned integration — `metrics.py` already has a `breached` attribute ready for it; nothing populates it yet
 - Self-contained HTML export
 - Any provider API integration (GitHub, Google Workspace, Microsoft Entra) — deferred on purpose, in favor of finishing the local-first core first
 - Drift monitoring / periodic review sessions (Roadmap v2)

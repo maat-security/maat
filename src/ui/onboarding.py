@@ -5,7 +5,9 @@ Integration is still a "coming soon" placeholder — no API client exists
 yet for GitHub or any other provider.
 """
 
+import queue
 import sys
+import threading
 import tkinter.filedialog as filedialog
 from pathlib import Path
 
@@ -188,29 +190,72 @@ class OnboardingFrame(ctk.CTkFrame):
         error_label = ctk.CTkLabel(dialog, text="", text_color=theme.ALERT, wraplength=380)
         error_label.pack(pady=(0, 4))
 
-        def run_import() -> None:
-            importer = IMPORTER_BY_LABEL[selector.get()]
-            try:
-                accounts = importer.parse(filepath)
-            except ValueError as exc:
-                error_label.configure(text=str(exc))
-                return
-
-            added = _add_accounts_to_graph(accounts)
-            dialog.destroy()
-            self._status_label.configure(
-                text=t("Imported {n} account{s}.").format(n=added, s="" if added == 1 else "s")
-            )
-            self._on_import_done()
-
-        ctk.CTkButton(
+        import_button = ctk.CTkButton(
             dialog,
             text=t("Import"),
             fg_color=theme.GOLD,
             text_color="#1A1A1A",
             hover_color=theme.GOLD_HOVER,
-            command=run_import,
-        ).pack()
+        )
+        import_button.pack()
+
+        def run_import() -> None:
+            importer = IMPORTER_BY_LABEL[selector.get()]
+            import_button.configure(state="disabled", text=t("Importing…"))
+            error_label.configure(text="")
+
+            # Parsing now includes a Have I Been Pwned lookup per
+            # password (see importers/_shared.py.compute_breach_flags),
+            # which means real network round trips — run it off the Tk
+            # main thread so the UI doesn't freeze. The worker thread
+            # never touches a Tk widget or calls self.after() itself —
+            # Tk widgets (and, on some Tcl builds, even after() from a
+            # non-main thread) aren't safe to touch off the main thread.
+            # It only puts its result on a thread-safe queue.Queue; the
+            # main thread polls that queue via its own self.after() loop.
+            result_queue = queue.Queue()
+
+            def worker() -> None:
+                try:
+                    accounts = importer.parse(filepath)
+                except ValueError as exc:
+                    result_queue.put(("error", str(exc)))
+                    return
+                result_queue.put(("success", accounts))
+
+            def poll_result() -> None:
+                try:
+                    kind, payload = result_queue.get_nowait()
+                except queue.Empty:
+                    self.after(50, poll_result)
+                    return
+                if kind == "error":
+                    _on_import_error(payload)
+                else:
+                    _on_import_success(payload)
+
+            threading.Thread(target=worker, daemon=True).start()
+            self.after(50, poll_result)
+
+        def _on_import_error(message: str) -> None:
+            import_button.configure(state="normal", text=t("Import"))
+            error_label.configure(text=message)
+
+        def _on_import_success(accounts: list) -> None:
+            added = _add_accounts_to_graph(accounts)
+            failed_checks = sum(1 for a in accounts if a.get("breach_check_failed"))
+            dialog.destroy()
+
+            message = t("Imported {n} account{s}.").format(n=added, s="" if added == 1 else "s")
+            if failed_checks:
+                message += " " + t(
+                    "Could not check {n} for known breaches — no connection to "
+                    "Have I Been Pwned."
+                ).format(n=failed_checks)
+            self._status_label.configure(text=message)
+            self._on_import_done()
+
+        import_button.configure(command=run_import)
 
 
 def _add_accounts_to_graph(accounts: list) -> int:
@@ -230,6 +275,7 @@ def _add_accounts_to_graph(accounts: list) -> int:
                 "url": account.get("url"),
                 "password_reused": account.get("password_reused", False),
                 "password_age_days": account.get("password_age_days"),
+                "breached": account.get("breached", False),
             },
         )
 

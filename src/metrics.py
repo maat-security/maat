@@ -311,6 +311,15 @@ def get_prioritized_gaps(graph: nx.DiGraph) -> list:
             "description": translate_to_consequences("orphaned_factor", identity, [identity]),
         })
 
+    _, exposure_detail = _compute_exposure_freshness(graph)
+    for identity in exposure_detail["breached_identities"]:
+        gaps.append({
+            "kind": "breached",
+            "node": identity,
+            "exposed_identities": [identity],
+            "description": translate_to_consequences("breached", identity, [identity]),
+        })
+
     gaps.sort(key=lambda g: len(g["exposed_identities"]), reverse=True)
     return gaps
 
@@ -357,6 +366,13 @@ def translate_to_consequences(metric_name: str, value, affected_nodes: list) -> 
         return (
             f"{value} has no backup. If you lose the device it depends on, "
             "you lose access permanently."
+        )
+
+    if metric_name == "breached":
+        return (
+            f"{value}'s password has appeared in a known data breach. "
+            "Anyone with that breach data can try it against this account "
+            "right now."
         )
 
     # Honest degradation: an unrecognized metric name is still reported,

@@ -73,6 +73,14 @@ GENERIC_RUNBOOKS = {
         ],
         "deep_link": None,
     },
+    "breached": {
+        "steps": [
+            "Open this account's settings and change its password now.",
+            "Use a long, unique password you haven't used anywhere else.",
+            "If you've reused this password elsewhere, change it on those accounts too.",
+        ],
+        "deep_link": None,
+    },
 }
 
 SEQUENCE_WARNINGS = {
@@ -269,6 +277,8 @@ def _apply_fix(g: nx.DiGraph, gap: dict) -> None:
         _apply_orphaned_factor_fix(g, node)
     elif kind == "cut_vertex":
         _apply_cut_vertex_fix(g, node)
+    elif kind == "breached":
+        _apply_breached_fix(g, node)
 
 
 def _apply_phishing_fix(g: nx.DiGraph, identity: str) -> None:
@@ -344,6 +354,15 @@ def _apply_orphaned_factor_fix(g: nx.DiGraph, identity: str) -> None:
     g.add_edge(recovery_id, identity, type="RECOVERS")
     if identity in g:
         g.nodes[identity]["last_verified"] = now
+
+
+def _apply_breached_fix(g: nx.DiGraph, identity: str) -> None:
+    """Clear the breach flag — the user just told us they changed the
+    password on the provider's site. Self-reported, like every other
+    fix here: there's no API call to verify it against."""
+    if identity in g:
+        g.nodes[identity]["breached"] = False
+        g.nodes[identity]["last_verified"] = _now_iso()
 
 
 def _apply_cut_vertex_fix(g: nx.DiGraph, node: str) -> None:

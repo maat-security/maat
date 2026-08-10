@@ -100,7 +100,15 @@ _ES = {
     "Confirm Format": "Confirmar Formato",
     "Which password manager is this export from?": "¿De qué gestor de contraseñas es este export?",
     "Import": "Importar",
+    "Importing…": "Importando…",
     "Imported {n} account{s}.": "Se importaron {n} cuenta{s}.",
+    (
+        "Could not check {n} for known breaches — no connection to "
+        "Have I Been Pwned."
+    ): (
+        "No se pudo revisar {n} contra breaches conocidos — sin "
+        "conexión a Have I Been Pwned."
+    ),
 
     # Questionnaire
     "Account name (e.g. Gmail)": "Nombre de la cuenta (ej. Gmail)",
