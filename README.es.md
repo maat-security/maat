@@ -116,11 +116,8 @@ _Última actualización: 09/08/2026._ Lo que realmente funciona hoy, contra lo q
 - Export a HTML autocontenido — score, desglose, gaps priorizados e historial de remediaciones en un solo archivo estático, sin recursos externos y sin secretos, guardado donde el usuario elija
 - UI bilingüe (inglés/español) y toggle de tema oscuro/claro
 - Shell de escritorio (CustomTkinter) con spec de empaquetado PyInstaller y workflow de CI para 3 sistemas operativos
-- Suite de tests automatizados — 111 tests de `pytest` bajo `tests/`, cubriendo el round-trip de cifrado de la bóveda, la matemática de blast-radius/cut-vertex/ciclos del grafo, los cuatro componentes del score, cada importer, el cliente de HIBP y su degradación offline, las seis mutaciones de fix de remediación, y el escapado del export HTML — corre en cada push y PR, en los 3 sistemas operativos, sin necesitar acceso a red
-
-**Gaps conocidos:**
-
-- No hay pantalla de visualización del grafo — el grafo existe y se consulta, pero no hay nada que mostrar visualmente todavía
+- Suite de tests automatizados — 117 tests de `pytest` bajo `tests/`, cubriendo el round-trip de cifrado de la bóveda, la matemática de blast-radius/cut-vertex/ciclos del grafo, los cuatro componentes del score, cada importer, el cliente de HIBP y su degradación offline, las seis mutaciones de fix de remediación, el escapado del export HTML, y el algoritmo de layout del grafo — corre en cada push y PR, en los 3 sistemas operativos, sin necesitar acceso a red
+- Visualización del grafo — una pantalla de exploración (nunca la pantalla principal) accesible desde el Dashboard, que renderiza cada cuenta/dispositivo/factor/canal de recuperación y sus relaciones con un layout de fuerzas en Python puro (sin dependencia de numpy); hacer clic en un nodo muestra su blast radius en el mismo lenguaje de consecuencias que el resto de la app
 
 **Sin empezar:**
 

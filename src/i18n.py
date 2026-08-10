@@ -176,6 +176,7 @@ _ES = {
     "Graph coverage: {known}/{total}": "Cobertura del grafo: {known}/{total}",
     "Fix This": "Arreglar Esto",
     "Recently Completed": "Completado Recientemente",
+    "View Graph": "Ver Grafo",
     "Export Report": "Exportar Reporte",
     "Save your posture report": "Guardá tu reporte de postura",
     "Report saved.": "Reporte guardado.",
@@ -221,6 +222,18 @@ _ES = {
     "Open Settings Page": "Abrir Página de Configuración",
     "Not Now": "Ahora No",
     "I Completed This": "Ya Hice Esto",
+
+    # Graph View
+    "Back to Dashboard": "Volver al Dashboard",
+    "Graph View": "Vista del Grafo",
+    "Click a node to see what depends on it.": "Hacé clic en un nodo para ver qué depende de él.",
+    "Account": "Cuenta",
+    "Sign-in Method": "Método de Inicio de Sesión",
+    "Device": "Dispositivo",
+    "Recovery Method": "Método de Recuperación",
+    "Password Store": "Gestor de Contraseñas",
+    "Provider": "Proveedor",
+    "Person": "Persona",
 }
 
 TRANSLATIONS = {"es": _ES}

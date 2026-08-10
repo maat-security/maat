@@ -51,11 +51,12 @@ def _component_labels() -> dict:
 class DashboardFrame(ctk.CTkFrame):
     """The main posture screen: score breakdown + prioritized gaps."""
 
-    def __init__(self, master, on_add_data, on_view_remediation=None):
+    def __init__(self, master, on_add_data, on_view_remediation=None, on_view_graph=None):
         colors = theme.current()
         super().__init__(master, fg_color=colors["bg"])
         self._on_add_data = on_add_data
         self._on_view_remediation = on_view_remediation
+        self._on_view_graph = on_view_graph
         self._build(colors)
 
     def _build(self, colors: dict) -> None:
@@ -99,6 +100,17 @@ class DashboardFrame(ctk.CTkFrame):
         ).pack(side="left", padx=6)
 
         if has_data:
+            if self._on_view_graph is not None:
+                ctk.CTkButton(
+                    button_row,
+                    text=t("View Graph"),
+                    fg_color=colors["card_bg"],
+                    text_color=colors["text_primary"],
+                    hover_color=theme.GOLD_HOVER,
+                    command=self._on_view_graph,
+                    width=140,
+                ).pack(side="left", padx=6)
+
             ctk.CTkButton(
                 button_row,
                 text=t("Export Report"),

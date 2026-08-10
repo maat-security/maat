@@ -124,10 +124,21 @@ For each of 1Password / Bitwarden / KeePass / generic CSV:
 - [ ] If you set up a scenario matching the PRD example (passkey auth + SMS recovery, or a mutual email/phone recovery cycle, or a lone TOTP factor with no backup) — confirm the matching gap shows up in the list, in plain language, with no metric names or raw numbers
 - [ ] Click **Fix This** on any gap → Remediation screen opens showing that gap's specific runbook
 - [ ] Click **Add More Data** → returns to Onboarding, previously entered data is untouched
+- [ ] Click **View Graph** → Graph View screen opens (see test case 6b below)
 - [ ] Click **Export Report** → save-file dialog opens, defaulting to a `.html` filename → save it somewhere → status message says the report was saved
 - [ ] Open that `.html` file directly in a real browser (double-click it, no app running) → renders correctly with no broken layout, and the score/gaps/history match what the Dashboard showed
 - [ ] Open the exported file's page source / view-source → confirm there's no `<script>` tag, no `http://` or `https://` reference of any kind (no external fonts, images, or calls out) — this file must work fully offline forever
 - [ ] Skim the file for anything that looks like a real password, TOTP secret, or recovery code — there should be nothing beyond account names, URLs, and the same plain-language gap text already on the Dashboard
+
+### 6b. Graph View
+
+- [ ] Every node from your test data appears once — no duplicates, none missing (cross-check the count against "Graph coverage" in the status bar)
+- [ ] Nodes don't visually overlap or sit directly on top of each other — the layout should read as a legible diagram, not a pile
+- [ ] The legend's colors match the circles actually drawn (e.g. every gold circle is an account, not a device)
+- [ ] Click a node → the text below the canvas updates to a plain-language blast-radius sentence (e.g. "If you lose access to X, these N accounts are exposed: ...") — no raw node IDs with hyphens/underscores shown as if they were the actual account name where a nicer name exists
+- [ ] Click a leaf node with nothing depending on it → text says "nothing else is exposed", not a blank or broken message
+- [ ] Click **Back to Dashboard** → returns cleanly, nothing on the Dashboard changed
+- [ ] Resize/reopen at a different display scale (see test case 9) → canvas and legend still fit on screen, nothing cut off
 
 ### 7. Remediation
 
@@ -152,7 +163,6 @@ For each of 1Password / Bitwarden / KeePass / generic CSV:
 
 These are known, already-documented gaps (see `README.md`'s Implementation Status section) — please don't file issues for these unless you're seeing something *worse* than "it doesn't exist yet":
 
-- Any graph visualization screen (not built)
 - Connect Integration doing anything beyond "Coming Soon"
 - Anything related to a published installer or `pip install maat` — there isn't one yet
 

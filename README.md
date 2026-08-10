@@ -116,11 +116,8 @@ _Last updated 2026-08-09._ What's real and running today, versus what's still on
 - Self-contained HTML export — score, breakdown, prioritized gaps, and remediation history as one static file with no external resources and no secrets, saved wherever the user picks
 - Bilingual UI (English/Spanish) and a dark/light theme toggle
 - Desktop shell (CustomTkinter) with a PyInstaller packaging spec and a three-OS CI build workflow
-- Automated test suite — 111 `pytest` tests under `tests/`, covering the vault's encryption round-trip, the graph engine's blast-radius/cut-vertex/cycle math, all four score components, every importer, the HIBP client and its offline degradation, all six remediation fix mutations, and the HTML export's escaping — run on every push and PR, on all three OSes, with no network access required
-
-**Known gaps:**
-
-- No graph visualization screen — the graph exists and is queried, but there's nothing to look at yet
+- Automated test suite — 117 `pytest` tests under `tests/`, covering the vault's encryption round-trip, the graph engine's blast-radius/cut-vertex/cycle math, all four score components, every importer, the HIBP client and its offline degradation, all six remediation fix mutations, the HTML export's escaping, and the graph layout algorithm — run on every push and PR, on all three OSes, with no network access required
+- Graph visualization — an exploration screen (never the main screen) reachable from the Dashboard, rendering every account/device/factor/recovery-channel and their relationships with a pure-Python force-directed layout (no numpy dependency); clicking a node shows its blast radius in the same consequence language as everywhere else in the app
 
 **Not started:**
 
