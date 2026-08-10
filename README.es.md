@@ -5,6 +5,7 @@ Your identity, in balance.
 ![License: MIT](https://img.shields.io/badge/License-MIT-C9A84C.svg)
 ![By Heru](https://img.shields.io/badge/by-Heru-2D2D2D.svg)
 ![Status: Pre-Alpha](https://img.shields.io/badge/status-pre--alpha-555555.svg)
+[![Tests](https://github.com/maat-security/maat/actions/workflows/test.yml/badge.svg)](https://github.com/maat-security/maat/actions/workflows/test.yml)
 
 🌐 También disponible en: [English](README.md)
 
@@ -115,11 +116,11 @@ _Última actualización: 09/08/2026._ Lo que realmente funciona hoy, contra lo q
 - Export a HTML autocontenido — score, desglose, gaps priorizados e historial de remediaciones en un solo archivo estático, sin recursos externos y sin secretos, guardado donde el usuario elija
 - UI bilingüe (inglés/español) y toggle de tema oscuro/claro
 - Shell de escritorio (CustomTkinter) con spec de empaquetado PyInstaller y workflow de CI para 3 sistemas operativos
+- Suite de tests automatizados — 111 tests de `pytest` bajo `tests/`, cubriendo el round-trip de cifrado de la bóveda, la matemática de blast-radius/cut-vertex/ciclos del grafo, los cuatro componentes del score, cada importer, el cliente de HIBP y su degradación offline, las seis mutaciones de fix de remediación, y el escapado del export HTML — corre en cada push y PR, en los 3 sistemas operativos, sin necesitar acceso a red
 
 **Gaps conocidos:**
 
 - No hay pantalla de visualización del grafo — el grafo existe y se consulta, pero no hay nada que mostrar visualmente todavía
-- No hay suite de tests automatizados commiteada — todo lo de arriba se verificó con scripts descartables durante el desarrollo, no con un suite de `pytest` en el repo
 
 **Sin empezar:**
 

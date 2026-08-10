@@ -5,6 +5,7 @@ Your identity, in balance.
 ![License: MIT](https://img.shields.io/badge/License-MIT-C9A84C.svg)
 ![By Heru](https://img.shields.io/badge/by-Heru-2D2D2D.svg)
 ![Status: Pre-Alpha](https://img.shields.io/badge/status-pre--alpha-555555.svg)
+[![Tests](https://github.com/maat-security/maat/actions/workflows/test.yml/badge.svg)](https://github.com/maat-security/maat/actions/workflows/test.yml)
 
 🌐 Also available in: [Español](README.es.md)
 
@@ -115,11 +116,11 @@ _Last updated 2026-08-09._ What's real and running today, versus what's still on
 - Self-contained HTML export — score, breakdown, prioritized gaps, and remediation history as one static file with no external resources and no secrets, saved wherever the user picks
 - Bilingual UI (English/Spanish) and a dark/light theme toggle
 - Desktop shell (CustomTkinter) with a PyInstaller packaging spec and a three-OS CI build workflow
+- Automated test suite — 111 `pytest` tests under `tests/`, covering the vault's encryption round-trip, the graph engine's blast-radius/cut-vertex/cycle math, all four score components, every importer, the HIBP client and its offline degradation, all six remediation fix mutations, and the HTML export's escaping — run on every push and PR, on all three OSes, with no network access required
 
 **Known gaps:**
 
 - No graph visualization screen — the graph exists and is queried, but there's nothing to look at yet
-- No committed automated test suite — everything above has been verified with throwaway scripts during development, not a checked-in `pytest` suite
 
 **Not started:**
 

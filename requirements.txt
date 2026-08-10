@@ -3,6 +3,12 @@ networkx
 cryptography
 requests
 
+# Dev-only: not imported by the app itself, only by tests/ (see
+# .github/workflows/test.yml). Listed here anyway so `pip install -r
+# requirements.txt` per the Getting Started instructions is enough to
+# run `pytest` too — no separate dev-requirements file to remember.
+pytest
+
 # PyInstaller packages release binaries in CI (see .github/workflows/build.yml).
 # It is not a runtime dependency of the app itself — install it separately:
 # pip install pyinstaller
