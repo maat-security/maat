@@ -62,6 +62,7 @@ Don't use your real accounts. Options:
 
 - **1Password**: create a free trial or a throwaway vault with 3-5 fake logins (mix of password-only, one with TOTP enabled, one with a passkey if your test device supports it), then export it as 1PUX (Settings → Export → 1Password Unencrypted Export).
 - **Bitwarden**: same idea — a throwaway vault, Tools → Export Vault → `.json` (unencrypted). Also create one item and set a password-protected export once, specifically to test that Maat rejects it with a clear error instead of crashing.
+- **KeePass**: create a throwaway `.kdbx` database with 3-5 fake entries (mix of password-only, one with a TOTP seed set via KeePass 2.54+'s built-in TOTP or the KeeTrayTOTP plugin), then File → Export → **KeePass XML (2.x)**. Also add one entry, delete it (so it lands in KeePass's own Recycle Bin group), and confirm it does *not* show up after import.
 - **Generic CSV**: export from Chrome (`chrome://settings/passwords` → ⋮ → Export passwords) or hand-write a CSV with columns `name,url,password,totp,last_modified`.
 - **Questionnaire**: no export needed — just answer with fake account names ("Test Bank", "Test Email").
 - **For the Have I Been Pwned check** (any import method): give at least one throwaway fake login a well-known breached password (e.g. `password123`, `qwerty123`) and at least one a long random string you generate yourself — the first should come back flagged, the second should not. Never use a real password you actually use anywhere, even a throwaway account's — the whole point of the k-anonymity design is that Maat doesn't need you to trust it with the real thing.
@@ -92,7 +93,7 @@ Don't use your real accounts. Options:
 
 ### 4. Onboarding — Import (repeat once per password manager)
 
-For each of 1Password / Bitwarden / generic CSV:
+For each of 1Password / Bitwarden / KeePass / generic CSV:
 
 - [ ] Click **Import Password Manager** → **Start** → file picker opens
 - [ ] Select your test export → format picker dialog appears with a sensible default guessed from the file extension
@@ -104,6 +105,8 @@ For each of 1Password / Bitwarden / generic CSV:
 - [ ] Turn off your network connection, then re-import a fresh test export → import still completes (accounts show up), but the success message also says it couldn't check for breaches — no crash, and nothing gets silently marked as clean
 - [ ] Select the **wrong** format on purpose (e.g. pick "Bitwarden" for a 1Password file) → should show a clear inline error, not crash
 - [ ] Bitwarden only: try importing a password-protected/encrypted export → clear error telling you to re-export unencrypted, no crash
+- [ ] KeePass only: the entry you deleted into the Recycle Bin before exporting does **not** appear among the imported accounts
+- [ ] KeePass only: the entry with a TOTP seed set shows up with its TOTP factor recognized (not treated as password-only)
 
 ### 5. Onboarding — Answer Questions
 
@@ -149,7 +152,6 @@ For each of 1Password / Bitwarden / generic CSV:
 
 These are known, already-documented gaps (see `README.md`'s Implementation Status section) — please don't file issues for these unless you're seeing something *worse* than "it doesn't exist yet":
 
-- KeePass XML import (not built)
 - Any graph visualization screen (not built)
 - Connect Integration doing anything beyond "Coming Soon"
 - Anything related to a published installer or `pip install maat` — there isn't one yet

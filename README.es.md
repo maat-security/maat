@@ -109,7 +109,7 @@ _Última actualización: 09/08/2026._ Lo que realmente funciona hoy, contra lo q
 - Motor del grafo de dependencias — validación de nodos/aristas, blast radius, cut vertices, detección de ciclos
 - Score de postura — los cuatro componentes ponderados del spec del producto, con desglose auditable
 - Cuestionario guiado — cuatro preguntas salteables por cuenta, como máquina de estados
-- Import de gestor de contraseñas — 1Password (`.1pux`), Bitwarden (JSON), CSV genérico — con detección de reutilización de passwords y chequeo de Have I Been Pwned en memoria, ninguno de los dos persiste el valor de la password
+- Import de gestor de contraseñas — 1Password (`.1pux`), Bitwarden (JSON), KeePass (XML), CSV genérico — con detección de reutilización de passwords y chequeo de Have I Been Pwned en memoria, ninguno de los dos persiste el valor de la password
 - Integración con Have I Been Pwned — chequeo k-anonymity contra Pwned Passwords (solo un prefijo de 5 caracteres del hash sale del dispositivo), corre en un hilo de fondo durante el import, aparece como gap priorizado ("esta password está filtrada") con su propio runbook de remediación
 - Remediación guiada — runbooks específicos por proveedor (Google, GitHub, Microsoft, Apple, fallback genérico honesto para el resto), simulación de impacto antes/después, historial de remediaciones auto-reportadas
 - Export a HTML autocontenido — score, desglose, gaps priorizados e historial de remediaciones en un solo archivo estático, sin recursos externos y sin secretos, guardado donde el usuario elija
@@ -118,7 +118,6 @@ _Última actualización: 09/08/2026._ Lo que realmente funciona hoy, contra lo q
 
 **Gaps conocidos:**
 
-- El import de KeePass XML no está construido — hoy solo 1Password, Bitwarden y CSV genérico
 - No hay pantalla de visualización del grafo — el grafo existe y se consulta, pero no hay nada que mostrar visualmente todavía
 - No hay suite de tests automatizados commiteada — todo lo de arriba se verificó con scripts descartables durante el desarrollo, no con un suite de `pytest` en el repo
 

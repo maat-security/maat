@@ -18,17 +18,19 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import graph  # noqa: E402
 import theme  # noqa: E402
 from i18n import t  # noqa: E402
-from importers import bitwarden, csv_generic, onepassword  # noqa: E402
+from importers import bitwarden, csv_generic, keepass, onepassword  # noqa: E402
 
 IMPORTER_BY_LABEL = {
     "1Password (.1pux)": onepassword,
     "Bitwarden (.json)": bitwarden,
+    "KeePass XML (2.x)": keepass,
     "Generic CSV": csv_generic,
 }
 
 EXTENSION_HINTS = {
     ".1pux": "1Password (.1pux)",
     ".json": "Bitwarden (.json)",
+    ".xml": "KeePass XML (2.x)",
     ".csv": "Generic CSV",
 }
 
@@ -143,7 +145,7 @@ class OnboardingFrame(ctk.CTkFrame):
         filepath = filedialog.askopenfilename(
             title=t("Select your password manager export"),
             filetypes=[
-                (t("Supported exports"), "*.1pux *.json *.csv"),
+                (t("Supported exports"), "*.1pux *.json *.xml *.csv"),
                 (t("All files"), "*.*"),
             ],
         )

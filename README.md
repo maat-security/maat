@@ -109,7 +109,7 @@ _Last updated 2026-08-09._ What's real and running today, versus what's still on
 - Dependency graph engine — node/edge validation, blast radius, cut vertices, cycle detection
 - Posture scoring — the four weighted components from the product spec, with an auditable breakdown
 - Guided questionnaire — four skippable questions per account, state-machine driven
-- Password manager import — 1Password (`.1pux`), Bitwarden (JSON), generic CSV — with in-memory password-reuse detection and a Have I Been Pwned breach check, neither of which ever persists a password value
+- Password manager import — 1Password (`.1pux`), Bitwarden (JSON), KeePass (XML), generic CSV — with in-memory password-reuse detection and a Have I Been Pwned breach check, neither of which ever persists a password value
 - Have I Been Pwned integration — k-anonymity Pwned Passwords check (only a 5-character hash prefix ever leaves the device), run in a background thread during import, surfaced as a prioritized "this password is breached" gap with its own remediation runbook
 - Guided remediation — provider-aware runbooks (Google, GitHub, Microsoft, Apple, honest generic fallback otherwise), before/after impact simulation, self-reported completion history
 - Self-contained HTML export — score, breakdown, prioritized gaps, and remediation history as one static file with no external resources and no secrets, saved wherever the user picks
@@ -118,7 +118,6 @@ _Last updated 2026-08-09._ What's real and running today, versus what's still on
 
 **Known gaps:**
 
-- KeePass XML import isn't built — only 1Password, Bitwarden, and generic CSV today
 - No graph visualization screen — the graph exists and is queried, but there's nothing to look at yet
 - No committed automated test suite — everything above has been verified with throwaway scripts during development, not a checked-in `pytest` suite
 
